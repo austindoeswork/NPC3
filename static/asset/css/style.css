@@ -1,0 +1,23 @@
+body {
+  margin: 40px;
+}
+
+#board {
+  width: 384px;
+  display: flex;
+  border: 2px solid black;
+  flex-flow: row wrap;
+
+  position: relative;
+}
+
+.box {
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  border: 1px solid grey;
+  font-size: 200%;
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+}

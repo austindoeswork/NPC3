@@ -1,0 +1,79 @@
+Inspiration 
+		duelyst
+		fire emblem
+
+Board
++|1234|1234|1234|1234+
++--------------------+
+|                *   |
+|  *                 |
+|       *         *  |
+|             *      |
+|    *   *   *       |
+|a       b**        A|
+| k           *    K |
+|g   h            H G|
+| r  *     *       R |
+|i       *    *     I|
+|      *   *         |
+|         *     *    |
+|   *   *       *    |
+| b   *    *         |
+|  G          *      |
++--------------------+
+[k] sir frodrick the toad sliced the enemy
+
+Troops
+name			atk		max.hp	mv		rng		ability
+[g]eneral		2		20		2		1		none
+[a]ssassin		2 || 8	10		3		1		backstab does 8 damage
+[k]night		4		12		2		1		none
+[h]ealer		-2		8		2		1		does negative damage
+[r]anger		1		8		2		2		can shoot over objects/troops
+ghand[i]		0		5		2		0		if he gets all the way to the other 
+				6		20		2		1	    side, turns into buff ghandi
+
+?[b]uilder 		0		10		3		1		can push boulders/people
+[m]age			0		8		2		1		attack creates a portal?
+[m]imic		
+[t]winz
+[c]annibal										can heal fully if they deal the final
+												blow
+[m]iner											gets stronger for every block broken
+bomber			like bomber man?
+
+Definitions
+		atk
+				how much hit points you deal when you strike an enemy
+		max.hp
+				how many hit points you start with
+		mv
+				how many squares (l, r, u, d) you can move
+		rng 
+				how many squares (l, diagonal lu, diag ld, r, diag ru, diag ud, u, d)
+				you can target for an attack
+
+Turn Mechanics
+		for each troop you can
+				move then atk
+				or 
+				atk
+
+open websocket
+		>> login
+		<< ack success:bool message:sir froggo sliced yo dik
+		<< game info
+				opponent name
+				p0/p1
+				boulders
+// if p1
+		<< enemy pick
+// else 
+		>> your pick
+		<< ack
+		<< enemy pick
+		>> your pick
+		<< ack
+		<< enemy pick
+
+

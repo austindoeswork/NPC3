@@ -2,12 +2,14 @@ package game
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
+	"time"
 )
 
 const (
 	OVER    = -1
-	RUNNING = 1
+	RUNNING = 2 //to leave room for player 0 and 1
 )
 
 type Game struct {
@@ -15,6 +17,7 @@ type Game struct {
 	Turn   int
 	Status int
 	Winner int
+	Update chan int
 }
 
 func (g *Game) AddTroop(t *Troop) error {
@@ -47,33 +50,61 @@ func (g *Game) AddBoulder(b *Boulder) error {
 	return nil
 }
 
-func (g *Game) MoveTroop(player, troopindex, x, y int) error {
+func (g *Game) MoveTroop(player, troopindex, x, y int) (string, error) {
+	if g.Status == OVER {
+		return "", fmt.Errorf("Game is over")
+	}
 	if player < 0 || player > 1 {
-		return fmt.Errorf("No such player %d", player)
+		return "", fmt.Errorf("No such player %d", player)
 	}
 	if troopindex < 0 || troopindex >= len(g.Board.Troops[player]) {
-		return fmt.Errorf("No such troop %d", troopindex)
+		return "", fmt.Errorf("No such troop %d", troopindex)
+	}
+	if !g.CanAct(player) {
+		return "", fmt.Errorf("Not your turn")
 	}
 
 	t := g.Board.Troops[player][troopindex]
 	if t == nil {
-		return fmt.Errorf("Nil troop at player: %d troopindex: %d", player, troopindex)
+		return "", fmt.Errorf("Nil troop at player: %d troopindex: %d", player, troopindex)
 	}
-	err := t.Act(g.Board, x, y)
 
+	res, err := t.Act(g.Board, x, y)
 	if err == nil {
+		SendIntOrTimeout(g.Update, 2, 1)
+
 		hp0 := g.Board.Troops[0][0].HP
 		hp1 := g.Board.Troops[1][0].HP
-		if hp0 <= 0 {
-			g.Status = OVER
-			g.Winner = 1
-		} else if hp1 <= 0 {
-			g.Status = OVER
-			g.Winner = 0
+		if hp0 <= 0 || hp1 <= 0 {
+			return "", g.End()
 		}
 	}
 
-	return err
+	return res, err
+}
+
+func (g *Game) End() error {
+	if g.Status == OVER {
+		return fmt.Errorf("Game is already over")
+	}
+
+	hp0 := g.Board.Troops[0][0].HP
+	hp1 := g.Board.Troops[1][0].HP
+	if hp0 <= 0 {
+		g.Winner = 1
+	} else if hp1 <= 0 {
+		g.Winner = 0
+	}
+
+	g.Status = OVER
+	go func() {
+		time.Sleep(time.Second)
+		SendIntOrTimeout(g.Update, int(g.Status), 1)
+		time.Sleep(time.Second)
+		close(g.Update)
+	}()
+
+	return nil
 }
 
 func (g *Game) ActivePlayer() int {
@@ -81,6 +112,9 @@ func (g *Game) ActivePlayer() int {
 }
 
 func (g *Game) CanAct(player int) bool {
+	if g.Status == OVER {
+		return false
+	}
 	if player < 0 || player > 1 {
 		return false
 	}
@@ -96,19 +130,26 @@ func (g *Game) CanAct(player int) bool {
 }
 
 func (g *Game) Step() {
+	if g.Status == OVER {
+		return
+	}
+
 	nextactiveplayer := (g.Turn + 1) % 2
 	for i := 0; i < len(g.Board.Troops[nextactiveplayer]); i++ {
 		g.Board.Troops[nextactiveplayer][i].Reset()
 	}
 	g.Turn = g.Turn + 1
+
+	SendIntOrTimeout(g.Update, nextactiveplayer, 1)
+	SendIntOrTimeout(g.Update, 2, 1)
 }
 
 func New() *Game {
 	g := &Game{
 		Board: &Board{
-			Width: 10,
+			Width: 12,
 			// Width:    20,
-			Height: 5,
+			Height: 7,
 			// Height:   15,
 			Boulders: []*Boulder{},
 			Troops:   [][]*Troop{[]*Troop{}, []*Troop{}},
@@ -118,6 +159,8 @@ func New() *Game {
 		},
 		Turn:   0,
 		Status: RUNNING,
+		Winner: -1,
+		Update: make(chan int),
 	}
 
 	//initialize troop and boulder maps
@@ -133,26 +176,34 @@ func New() *Game {
 	}
 
 	// TODO rando gen boulders
-	// for i := 7; i < 15; i++ {
-	// b := NewBoulder(i, 8)
-	// g.AddBoulder(b)
-	// }
-	p0general, _ := NewTroop("general", 0, 2, 0)
+	for i := 2; i < 10; i++ {
+		for j := 0; j < 7; j++ {
+			if rand.Intn(100) < 20 {
+				b := NewBoulder(i, j)
+				g.AddBoulder(b)
+
+			}
+		}
+	}
+
+	p0general, _ := NewTroop("general", 0, 3, 0)
 	p0knight, _ := NewTroop("knight", 1, 3, 0)
+	p0healer, _ := NewTroop("healer", 0, 2, 0)
+	p0archer, _ := NewTroop("archer", 0, 4, 0)
 
-	p1general, _ := NewTroop("general", 9, 2, 1)
-	p1knight, _ := NewTroop("knight", 8, 2, 1)
-
-	b0 := NewBoulder(0, 1)
-	b1 := NewBoulder(1, 2)
-
-	g.AddBoulder(b0)
-	g.AddBoulder(b1)
+	p1general, _ := NewTroop("general", 11, 3, 1)
+	p1knight, _ := NewTroop("knight", 10, 3, 1)
+	p1healer, _ := NewTroop("healer", 11, 2, 1)
+	p1archer, _ := NewTroop("archer", 11, 4, 1)
 
 	g.AddTroop(p0general)
 	g.AddTroop(p0knight)
+	g.AddTroop(p0healer)
+	g.AddTroop(p0archer)
 	g.AddTroop(p1general)
 	g.AddTroop(p1knight)
+	g.AddTroop(p1healer)
+	g.AddTroop(p1archer)
 
 	return g
 }
@@ -231,11 +282,15 @@ type GameState struct {
 }
 
 func (g *Game) GetState(player int) *GameState {
-	opponent := -1
-	if player == 0 {
+	var opponent int
+	switch player {
+	case 0:
 		opponent = 1
-	} else {
+	case 1:
 		opponent = 0
+	default:
+		player = -1
+		opponent = -1
 	}
 
 	gs := &GameState{
@@ -252,4 +307,18 @@ func (g *Game) GetState(player int) *GameState {
 		Boulders: g.Board.Boulders,
 	}
 	return gs
+}
+
+func SendIntOrTimeout(msgchan chan int, num int, seconds int) {
+	timeout := make(chan struct{})
+	go func() {
+		time.Sleep(time.Duration(seconds) * time.Second)
+		timeout <- struct{}{}
+	}()
+	go func() {
+		select {
+		case msgchan <- num:
+		case <-timeout:
+		}
+	}()
 }

@@ -1,0 +1,99 @@
+{
+    "Board": {
+        "Height": 5,
+        "Width": 10
+    },
+    "Boulders": [
+        {
+            "HP": 10,
+            "MaxHP": 10,
+            "X": 0,
+            "Y": 1
+        },
+        {
+            "HP": 10,
+            "MaxHP": 10,
+            "X": 1,
+            "Y": 2
+        }
+    ],
+    "Opponent": 1,
+    "Status": 2,
+    "Troops": [
+        [
+            {
+                "CanAct": true,
+                "HP": 25,
+                "Info": {
+                    "Atk": 2,
+                    "MaxHP": 25,
+                    "Mv": 2,
+                    "Name": "general",
+                    "Rng": 1,
+                    "Secondary": 0,
+                    "ShortName": "g"
+                },
+                "Owner": 0,
+                "Step": 0,
+                "X": 0,
+                "Y": 2
+            },
+            {
+                "CanAct": true,
+                "HP": 12,
+                "Info": {
+                    "Atk": 4,
+                    "MaxHP": 12,
+                    "Mv": 2,
+                    "Name": "knight",
+                    "Rng": 1,
+                    "Secondary": 0,
+                    "ShortName": "k"
+                },
+                "Owner": 0,
+                "Step": 0,
+                "X": 1,
+                "Y": 3
+            }
+        ],
+        [
+            {
+                "CanAct": true,
+                "HP": 25,
+                "Info": {
+                    "Atk": 2,
+                    "MaxHP": 25,
+                    "Mv": 2,
+                    "Name": "general",
+                    "Rng": 1,
+                    "Secondary": 0,
+                    "ShortName": "g"
+                },
+                "Owner": 1,
+                "Step": 0,
+                "X": 9,
+                "Y": 2
+            },
+            {
+                "CanAct": true,
+                "HP": 12,
+                "Info": {
+                    "Atk": 4,
+                    "MaxHP": 12,
+                    "Mv": 2,
+                    "Name": "knight",
+                    "Rng": 1,
+                    "Secondary": 0,
+                    "ShortName": "k"
+                },
+                "Owner": 1,
+                "Step": 0,
+                "X": 8,
+                "Y": 2
+            }
+        ]
+    ],
+    "Turn": 0,
+    "Winner": -1,
+    "You": 0
+}

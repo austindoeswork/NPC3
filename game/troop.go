@@ -2,7 +2,7 @@ package game
 
 import "fmt"
 
-type TroopAction func(b *Board, self *Troop, x, y int) error
+type TroopAction func(b *Board, self *Troop, x, y int) (string, error)
 
 type TroopInfo struct {
 	Name      string
@@ -21,7 +21,7 @@ var TroopList = map[string]TroopInfo{
 		ShortName: "g",
 		Atk:       2,
 		Secondary: 0,
-		MaxHP:     25,
+		MaxHP:     5,
 		Mv:        2,
 		Rng:       1,
 		Act:       TroopActions["default"],
@@ -83,9 +83,9 @@ func CountSteps(b *Board, t *Troop, tox, toy int) int {
 	}
 }
 
-func DefaultActTroop(b *Board, t *Troop, x, y int) error {
+func DefaultActTroop(b *Board, t *Troop, x, y int) (string, error) {
 	if !b.Inbounds(x, y) {
-		return fmt.Errorf("Can't move out of bounds")
+		return "", fmt.Errorf("Can't move out of bounds")
 	}
 	what := b.WhatIsAt(x, y)
 	if what != -1 {
@@ -93,27 +93,45 @@ func DefaultActTroop(b *Board, t *Troop, x, y int) error {
 			b.Damage(x, y, t.Info.Atk)
 			t.CanAct = false
 		} else {
-			return fmt.Errorf("Target out of range")
+			return "", fmt.Errorf("Target out of range")
 		}
 	}
-	return nil
+
+	//fun stuff
+	hitstring := "smacked"
+	if t.Info.Atk < 0 {
+		hitstring = "healed"
+	}
+	enemystring := ""
+	if what == t.Owner {
+		enemystring = "his friend"
+	} else if what == 2 {
+		enemystring = "a rock"
+	} else {
+		enemystring = "a bad guy"
+	}
+
+	if x == t.X && y == t.Y {
+		enemystring = "himself"
+	}
+	return fmt.Sprintf("%s %s %s", t.Nickname, hitstring, enemystring), nil
 }
 
-func DefaultMoveTroop(b *Board, t *Troop, x, y int) error {
+func DefaultMoveTroop(b *Board, t *Troop, x, y int) (string, error) {
 	if !b.Inbounds(x, y) {
-		return fmt.Errorf("Can't move out of bounds")
+		return "", fmt.Errorf("Can't move out of bounds")
 	}
 	steps := CountSteps(b, t, x, y)
 	if steps < 0 || steps > t.Info.Mv-t.Step {
-		return fmt.Errorf("Can't move that far - steps left: %d", t.Info.Mv-t.Step)
+		return "", fmt.Errorf("Can't move that far - steps left: %d", t.Info.Mv-t.Step)
 	}
 
 	switch steps {
 	case 0:
-		return fmt.Errorf("Zero step move")
+		return "", fmt.Errorf("Zero step move")
 	case 1:
 		if b.WhatIsAt(x, y) != -1 {
-			return fmt.Errorf("Can't move thru something")
+			return "", fmt.Errorf("Can't move thru something")
 		}
 	case 2:
 		dx := x - t.X
@@ -124,9 +142,16 @@ func DefaultMoveTroop(b *Board, t *Troop, x, y int) error {
 			ywhat := b.WhatIsAt(t.X, t.Y+dy)
 			yokay := ywhat == -1 || ywhat == t.Owner
 			if !(xokay || yokay) {
-				return fmt.Errorf("Can't move thru something")
+				return "", fmt.Errorf("Can't move thru something")
+			}
+		} else {
+			what := b.WhatIsAt(t.X+(dx/2), t.Y+(dy/2))
+			okay := what == -1 || what == t.Owner
+			if !okay {
+				return "", fmt.Errorf("Can't move thru something")
 			}
 		}
+
 	}
 	t.Step += steps
 
@@ -135,20 +160,19 @@ func DefaultMoveTroop(b *Board, t *Troop, x, y int) error {
 	t.X = x
 	t.Y = y
 
-	return nil
+	return fmt.Sprintf("%s moved %d steps", t.Nickname, steps), nil
 }
 
 var TroopActions = map[string]TroopAction{
-	"default": func(b *Board, self *Troop, x, y int) error {
+	"default": func(b *Board, self *Troop, x, y int) (string, error) {
 		if !self.CanAct {
-			return fmt.Errorf("No more actions allowed")
+			return "", fmt.Errorf("Troop has no more actions")
 		}
 		if b.IsEmpty(x, y) {
 			return DefaultMoveTroop(b, self, x, y)
 		} else {
 			return DefaultActTroop(b, self, x, y)
 		}
-		return nil
 	},
 }
 
@@ -157,14 +181,15 @@ type Troop struct {
 	Owner int
 
 	//mutable info
-	HP     int
-	X      int
-	Y      int
-	Step   int
-	CanAct bool
+	Nickname string
+	HP       int
+	X        int
+	Y        int
+	Step     int
+	CanAct   bool
 }
 
-func (t *Troop) Act(b *Board, x, y int) error {
+func (t *Troop) Act(b *Board, x, y int) (string, error) {
 	return t.Info.Act(b, t, x, y)
 }
 
@@ -172,6 +197,10 @@ func (t *Troop) Reset() error {
 	t.CanAct = true
 	t.Step = 0
 	return nil
+}
+
+func gennickname(name string) string {
+	return "jimmy"
 }
 
 func NewTroop(name string, x, y, owner int) (*Troop, error) {
@@ -183,8 +212,9 @@ func NewTroop(name string, x, y, owner int) (*Troop, error) {
 	//TODO check owner
 	info := TroopList[name]
 	return &Troop{
-		Owner: owner,
-		Info:  info,
+		Owner:    owner,
+		Nickname: gennickname(name),
+		Info:     info,
 
 		HP:     info.MaxHP,
 		X:      x,

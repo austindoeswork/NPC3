@@ -26,12 +26,12 @@ Board
 Troops
 name			atk		max.hp	mv		rng		ability
 [g]eneral		2		20		2		1		none
-[a]ssassin		2 || 8	10		3		1		backstab does 8 damage
 [k]night		4		12		2		1		none
 [h]ealer		-2		8		2		1		does negative damage
 [r]anger		1		8		2		2		can shoot over objects/troops
 ghand[i]		0		5		2		0		if he gets all the way to the other 
 				6		20		2		1	    side, turns into buff ghandi
+[a]ssassin		2 || 8	10		3		1		backstab does 8 damage
 
 ?[b]uilder 		0		10		3		1		can push boulders/people
 [m]age			0		8		2		1		attack creates a portal?

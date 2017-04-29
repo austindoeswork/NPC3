@@ -5,8 +5,10 @@ import (
 )
 
 type Board struct {
-	Width    int
-	Height   int
+	Width       int
+	Height      int
+	LastMessage string
+
 	Boulders []*Boulder
 	Troops   [][]*Troop
 
@@ -55,23 +57,27 @@ func (b *Board) IsEmpty(x, y int) bool {
 	return false
 }
 
-func (b *Board) Damage(x, y, dmg int) error {
+//returns true if the damaged thing got killed
+func (b *Board) Damage(x, y, dmg int) (bool, error) {
+	killed := false
+
 	if !b.Inbounds(x, y) {
-		return fmt.Errorf("Out of bounds")
+		return false, fmt.Errorf("Out of bounds")
 	}
 	what := b.WhatIsAt(x, y)
 	if what == -1 {
-		return fmt.Errorf("Nothing to damage at x:%d y:%d", x, y)
+		return false, fmt.Errorf("Nothing to damage at x:%d y:%d", x, y)
 	} else if what == 2 {
 		boul := b.BoulderMap[x][y]
 		if boul == nil {
-			return fmt.Errorf("No boulder")
+			return false, fmt.Errorf("No boulder")
 		}
 		boul.HP -= dmg
 		if boul.HP > boul.MaxHP {
 			boul.HP = boul.MaxHP
 		}
 		if boul.HP <= 0 {
+			killed = true
 			b.BoulderMap[x][y] = nil
 			index := -1
 			for i := 0; i < len(b.Boulders); i++ {
@@ -87,13 +93,14 @@ func (b *Board) Damage(x, y, dmg int) error {
 	} else {
 		t := b.TroopMap[x][y]
 		if t == nil {
-			return fmt.Errorf("No troop")
+			return false, fmt.Errorf("No troop")
 		}
 		t.HP -= dmg
 		if t.HP > t.Info.MaxHP {
 			t.HP = t.Info.MaxHP
 		}
 		if t.HP <= 0 {
+			killed = true
 			index := -1
 			for i := 0; i < len(b.Troops[t.Owner]); i++ {
 				if b.Troops[t.Owner][i] == t {
@@ -111,5 +118,5 @@ func (b *Board) Damage(x, y, dmg int) error {
 		}
 	}
 
-	return nil
+	return killed, nil
 }

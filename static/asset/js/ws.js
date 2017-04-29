@@ -23,12 +23,18 @@ function processgames(e) {
 
 		for (var i = 0; i < response.length; i++) {
 			let gamerow = document.createElement("div");
-			let touchrow = rowclicked;
-			gamerow.onclick = touchrow.bind(gamerow, response[i].Name);
+			let rowjoin = rowclicked;
+			gamerow.onclick = rowjoin.bind(gamerow, response[i].Name, response[i].Players);
 			gamerow.className = " gamerow ";
+
+			// let joinrow = document.createElement("button");
+			// let rowjoin = joinclicked;
+			// joinrow.onclick = rowjoin.bind(joinrow, response[i].Name);
 
 			glist.appendChild(gamerow);
 			gamerow.innerHTML = response[i].Name + " -- " + response[i].Players.toString();
+			// gamerow.appendChild(joinrow);
+			// gamerow.appendChild(watchrow);
 		}
 	}
 }
@@ -45,13 +51,25 @@ function addlisteners() {
 	};
 }
 
-function rowclicked(gamename) {
+function rowclicked(gamename, numplayers) {
+    if (ws) {
+		ws.close();
+	}
+		console.log("ROWCLICKED", gamename, numplayers);
+
     var wspath = "ws://" + location.hostname + ":" + location.port;
     var wsroute = "/ws";
+    if (numplayers >= 2) {
+		wsroute = "/wswatch";
+    }
+
     wsopen(wspath, wsroute, gamename, handlemessage);
 }
 
 function wsjoin() {
+    if (ws) {
+		ws.close();
+	}
     var wspath = "ws://" + location.hostname + ":" + location.port;
     var wsroute = "/ws";
     var gname = document.getElementById("gamename").value;
@@ -60,30 +78,34 @@ function wsjoin() {
 
 function handlemessage(msg) {
 	let cmd = JSON.parse(msg);
-	if (cmd.Type == "PROMPT") {
+		console.log(cmd);
+	
+	if (cmd.Type == "STATE") {
+		let currentmsg = document.getElementById("status").innerHTML;
+		if (currentmsg  != "YOUR TURN") {
+			setstatus(cmd.Message, "");
+		}
+	} else {
+		messagenoise(cmd.Message);
 		setstatus(cmd.Message, "");
-		if (cmd.Message == "YOUR TURN") {
-			let audio = new Audio('asset/sound/block.mp3');
-			audio.play();
-		}
-	} else if (cmd.Type == "ACK") {
-		if (cmd.Success) {
-			setstatus(cmd.Message, "label label-info");
-		    if (cmd.Message.includes("healed")) {
-					let audio = new Audio('asset/sound/heal.mp3');
-					audio.play();
-					console.log("HEALED");
-			}
-		    else {
-					let audio = new Audio('asset/sound/chess.mp3');
-					audio.play();
-					console.log("OTERH");
-			}
-		} else {
-			setstatus(cmd.Message, "label label-danger");
-		}
-	} else if (cmd.Type == "STATE") {
+	}
+	if (cmd.Type == "STATE") {
 		update(cmd);
+	}	
+}
+
+function messagenoise(msg) {
+	if (msg == "YOUR TURN") {
+		let audio = new Audio('asset/sound/block.mp3');
+		audio.play();
+	}
+	else if (msg.includes("healed")) {
+		let audio = new Audio('asset/sound/heal.mp3');
+		audio.play();
+	}
+	else {
+		let audio = new Audio('asset/sound/chess.mp3');
+		audio.play();
 	}
 }
 
@@ -102,6 +124,7 @@ function wsopen(wspath, wsroute, gname, handlemessage) {
     }
     ws.onclose = function(evt) {
 		setstatus("DISCONNECTED", "label label-danger");
+		console.log(evt);
 		ws = null;
     }
     ws.onmessage = function(evt) {

@@ -140,8 +140,8 @@ func (g *Game) Step() {
 	}
 	g.Turn = g.Turn + 1
 
-	SendIntOrTimeout(g.Update, nextactiveplayer, 1)
 	SendIntOrTimeout(g.Update, 2, 1)
+	SendIntOrTimeout(g.Update, nextactiveplayer, 1)
 }
 
 func New() *Game {
@@ -156,6 +156,8 @@ func New() *Game {
 			//			 x y
 			TroopMap:   [][]*Troop{},
 			BoulderMap: [][]*Boulder{},
+
+			LastMessage: "Game Started.",
 		},
 		Turn:   0,
 		Status: RUNNING,
@@ -176,34 +178,44 @@ func New() *Game {
 	}
 
 	// TODO rando gen boulders
-	for i := 2; i < 10; i++ {
+	for i := 2; i < 6; i++ {
 		for j := 0; j < 7; j++ {
 			if rand.Intn(100) < 20 {
-				b := NewBoulder(i, j)
-				g.AddBoulder(b)
-
+				b0 := NewBoulder(i, j)
+				b1 := NewBoulder(g.Board.Width-i-1, g.Board.Height-j-1)
+				g.AddBoulder(b0)
+				g.AddBoulder(b1)
 			}
 		}
 	}
 
-	p0general, _ := NewTroop("general", 0, 3, 0)
+	p0healer, _ := NewTroop("healer", 0, 4, 0)
+	p0assassin, _ := NewTroop("assassin", 1, 4, 0)
+	p0king, _ := NewTroop("king", 0, 3, 0)
 	p0knight, _ := NewTroop("knight", 1, 3, 0)
-	p0healer, _ := NewTroop("healer", 0, 2, 0)
-	p0archer, _ := NewTroop("archer", 0, 4, 0)
+	p0ranger, _ := NewTroop("ranger", 0, 2, 0)
+	p0cannibal, _ := NewTroop("cannibal", 1, 2, 0)
 
-	p1general, _ := NewTroop("general", 11, 3, 1)
-	p1knight, _ := NewTroop("knight", 10, 3, 1)
+	p1assassin, _ := NewTroop("assassin", 10, 2, 1)
 	p1healer, _ := NewTroop("healer", 11, 2, 1)
-	p1archer, _ := NewTroop("archer", 11, 4, 1)
+	p1knight, _ := NewTroop("knight", 10, 3, 1)
+	p1king, _ := NewTroop("king", 11, 3, 1)
+	p1ranger, _ := NewTroop("ranger", 11, 4, 1)
+	p1cannibal, _ := NewTroop("cannibal", 10, 4, 1)
 
-	g.AddTroop(p0general)
+	g.AddTroop(p0king)
 	g.AddTroop(p0knight)
 	g.AddTroop(p0healer)
-	g.AddTroop(p0archer)
-	g.AddTroop(p1general)
+	g.AddTroop(p0ranger)
+	g.AddTroop(p0cannibal)
+	g.AddTroop(p0assassin)
+
+	g.AddTroop(p1king)
 	g.AddTroop(p1knight)
 	g.AddTroop(p1healer)
-	g.AddTroop(p1archer)
+	g.AddTroop(p1ranger)
+	g.AddTroop(p1cannibal)
+	g.AddTroop(p1assassin)
 
 	return g
 }
@@ -279,6 +291,7 @@ type GameState struct {
 	Board    BoardState
 	Troops   [][]*Troop
 	Boulders []*Boulder
+	Message  string
 }
 
 func (g *Game) GetState(player int) *GameState {
@@ -305,6 +318,8 @@ func (g *Game) GetState(player int) *GameState {
 		},
 		Troops:   g.Board.Troops,
 		Boulders: g.Board.Boulders,
+
+		Message: g.Board.LastMessage,
 	}
 	return gs
 }

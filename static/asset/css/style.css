@@ -89,3 +89,22 @@ body {
 .gamerow:hover {
   background: lightblue;
 }
+
+.description {
+  font-size: 12px;
+}
+
+.quote {
+  font-size: 10px;
+}
+.glow {
+    -webkit-transition: text-shadow 0.2s linear;
+    -moz-transition: text-shadow 0.2s linear;
+    -ms-transition: text-shadow 0.2s linear;
+    -o-transition: text-shadow 0.2s linear;
+    transition: text-shadow 0.2s linear;
+}
+.glow:hover {
+    text-shadow: 0 0 10px red; /* replace with whatever color you want */
+}
+

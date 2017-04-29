@@ -20,6 +20,8 @@ var tileHover = (function(i) {
 		tt.style.opacity = "1";
 		tt.style.borderColor = troopcolor(troopa.Troop);
 		tt.innerHTML = troopa.Troop.Nickname + " the " + troopa.Troop.Info.Name;
+		tt.innerHTML += "<p class='description'>" + troopa.Troop.Info.Description + "</p>";
+		tt.innerHTML += "<p class='quote'>" + troopa.Troop.Info.Quote + "</p>";
 	}
 });
 
@@ -116,6 +118,8 @@ var endturn = (function() {
 });
 
 var update = (function(state) {
+    console.log("got update")
+
 	clearmap();
 	cleartiles();
 
@@ -123,9 +127,11 @@ var update = (function(state) {
 
 	if (state.You == state.Turn % 2) {
 		document.getElementById("endturn").className = "btn btn-sm btn-warning";
+		document.getElementById("endturn").innerHTML = "End Turn";
 	}
 	else {
 		document.getElementById("endturn").className = "btn btn-sm btn-default";
+		document.getElementById("endturn").innerHTML = "Enemy Turn";
 	}
 	game.troops = state.Troops;
 	game.boulders = state.Boulders;
@@ -180,7 +186,7 @@ var parsetroops = (function(){
 						let y = t.Y;
 						let index = y * game.width + x;
 						if (t.Step < t.Info.Mv) {
-							game.tilelist[index].innerHTML = "<b>" + t.Info.ShortName + "</b>";
+							game.tilelist[index].innerHTML = "<b class='glow'>" + t.Info.ShortName + "</b>";
 						}
 						else {
 							game.tilelist[index].innerHTML = t.Info.ShortName;

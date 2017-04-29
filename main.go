@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/austindoeswork/NPC3/manager"
 	"github.com/austindoeswork/NPC3/server"
@@ -13,6 +15,7 @@ const (
 )
 
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	// g := game.New()
 	// gs := g.GetState(0)
 	// b, _ := json.Marshal(gs)

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/austindoeswork/NPC3/game"
 	"github.com/austindoeswork/NPC3/manager"
 	"github.com/gorilla/websocket"
 )
@@ -37,6 +38,7 @@ func New(port string, static string, gm *manager.Manager) *Server {
 	s.AddStaticHandler(s.static)
 
 	s.AddHandleFunc("/ws", s.JoinWS)
+	s.AddHandleFunc("/wswatch", s.WatchWS)
 	s.AddHandleFunc("/games", s.ListGames)
 
 	return s
@@ -78,6 +80,76 @@ func cleanstring(input string) string {
 		output = strings.Replace(output, v, "?", -1)
 	}
 	return output
+}
+
+type State struct {
+	Type string
+	*game.GameState
+}
+
+func (s *Server) WatchWS(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("WATCH CALLED")
+	gamename := r.FormValue("game")
+	if len(gamename) <= 0 {
+		w.Write([]byte("No gamename provided"))
+		fmt.Println("WATCH NO GAME")
+
+		return
+	}
+	gamename = cleanstring(gamename)
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Cannot upgrade websocket", err)
+		return
+	}
+
+	gameoutput := make(chan []byte)
+
+	// ADD WATCHER
+	err = s.gmanager.AddWatcher(gameoutput, gamename)
+	if err != nil {
+		ack := &Ack{
+			Type:    "ACK",
+			Success: false,
+			Message: err.Error(),
+		}
+		conn.WriteJSON(ack)
+		log.Println(err)
+		return
+	}
+
+	gs := s.gmanager.GameMap[gamename].GetState(-1)
+	st := &State{
+		Type:      "STATE",
+		GameState: gs,
+	}
+	conn.WriteJSON(st)
+
+	ack := &Ack{
+		Type:    "ACK",
+		Success: true,
+		Message: fmt.Sprintf("Watching %s", gamename),
+	}
+
+	fmt.Println("SENDING THE THING")
+	err = conn.WriteJSON(ack)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//OUTPUT
+	go func() {
+		defer conn.Close()
+		for msg := range gameoutput {
+			err = conn.SetWriteDeadline(time.Now().Add(1 * time.Minute))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			fmt.Printf("[w] %6.6s >> %-20.20s\n", gamename, msg)
+			conn.WriteMessage(1, msg)
+		}
+	}()
 }
 
 func (s *Server) JoinWS(w http.ResponseWriter, r *http.Request) {
@@ -139,7 +211,7 @@ func (s *Server) JoinWS(w http.ResponseWriter, r *http.Request) {
 	//OUTPUT
 	go func() {
 		for msg := range gameoutput {
-			err = conn.SetReadDeadline(time.Now().Add(2 * time.Minute))
+			err = conn.SetReadDeadline(time.Now().Add(5 * time.Minute))
 			if err != nil {
 				log.Println(err)
 				return
@@ -156,7 +228,7 @@ func (s *Server) JoinWS(w http.ResponseWriter, r *http.Request) {
 			log.Println("Closing websocket", err)
 			return
 		}
-		err = conn.SetReadDeadline(time.Now().Add(2 * time.Minute))
+		err = conn.SetReadDeadline(time.Now().Add(5 * time.Minute))
 		if err != nil {
 			log.Println(err)
 			return

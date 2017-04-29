@@ -106,7 +106,6 @@ func (m *Manager) HandleGameOutput(gamename string) {
 	update := m.GameMap[gamename].Update
 
 	for msg := range update {
-		fmt.Println("GOT MESSAGE", msg)
 		switch msg {
 		case -1: //game over
 			for _, l := range m.GameListeners[gamename] {
@@ -263,7 +262,6 @@ func (m *Manager) AddPlayer(gameinput chan []byte, gameoutput chan []byte, gamen
 			if err != nil {
 				log.Println(err)
 			} else {
-				fmt.Println("C")
 				SendBytesOrTimeout(gameoutput, res, 1)
 			}
 		}
@@ -282,7 +280,6 @@ func (m *Manager) AddPlayer(gameinput chan []byte, gameoutput chan []byte, gamen
 				if err != nil {
 					log.Println(err)
 				}
-				fmt.Println("D")
 				SendBytesOrTimeout(l.Output, b, 1)
 			}
 
@@ -294,12 +291,25 @@ func (m *Manager) AddPlayer(gameinput chan []byte, gameoutput chan []byte, gamen
 			if err != nil {
 				log.Println(err)
 			}
-			fmt.Println("E")
 			SendBytesOrTimeout(m.PlayerMap[gamename][0].Output, b, 1)
 		}()
 	}
 
 	return playerindex, nil
+}
+
+func (m *Manager) AddWatcher(gameoutput chan []byte, gamename string) error {
+	if !m.Exists(gamename) {
+		return fmt.Errorf("Game %s does not exist", gamename)
+	}
+
+	l := NewListener(gameoutput, len(m.GameListeners[gamename]))
+	if l == nil {
+		return fmt.Errorf("Could not create listener")
+	}
+
+	m.GameListeners[gamename] = append(m.GameListeners[gamename], l)
+	return nil
 }
 
 func SendBytesOrTimeout(msgchan chan []byte, msg []byte, seconds int) {

@@ -88,12 +88,9 @@ type State struct {
 }
 
 func (s *Server) WatchWS(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("WATCH CALLED")
 	gamename := r.FormValue("game")
 	if len(gamename) <= 0 {
 		w.Write([]byte("No gamename provided"))
-		fmt.Println("WATCH NO GAME")
-
 		return
 	}
 	gamename = cleanstring(gamename)
@@ -131,7 +128,6 @@ func (s *Server) WatchWS(w http.ResponseWriter, r *http.Request) {
 		Message: fmt.Sprintf("Watching %s", gamename),
 	}
 
-	fmt.Println("SENDING THE THING")
 	err = conn.WriteJSON(ack)
 	if err != nil {
 		fmt.Println(err)
@@ -210,6 +206,7 @@ func (s *Server) JoinWS(w http.ResponseWriter, r *http.Request) {
 
 	//OUTPUT
 	go func() {
+		defer conn.Close()
 		for msg := range gameoutput {
 			err = conn.SetReadDeadline(time.Now().Add(5 * time.Minute))
 			if err != nil {

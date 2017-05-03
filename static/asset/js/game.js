@@ -10,9 +10,7 @@ game.height = 7;
 game.player = -1;
 game.clickedx = -1;
 game.clickedy = -1;
-
-
-
+ 
 var tileHover = (function(i) {
 	let troopa = game.map[i];
 	if (troopa && ("Troop" in troopa)) {

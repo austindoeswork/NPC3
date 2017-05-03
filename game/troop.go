@@ -22,7 +22,7 @@ var TroopList = map[string]TroopInfo{
 		Name:        "king",
 		ShortName:   "K",
 		Description: "If he dies, you lose",
-		Quote:       `"If you die in the Kranch, you die in real life. -Caleb"`,
+		Quote:       `"If you die in the Kranch, you die in real life." -Caleb`,
 		Atk:         2,
 		Secondary:   0,
 		MaxHP:       5,
@@ -61,7 +61,7 @@ var TroopList = map[string]TroopInfo{
 		Name:        "ranger",
 		ShortName:   "r",
 		Description: "Can shoot over boulders and people",
-		Quote:       `"Boom. Headshot. -jimmy"`,
+		Quote:       `"Boom. Headshot." -jimmy`,
 		Atk:         2,
 		Secondary:   0,
 		MaxHP:       8,
@@ -74,12 +74,12 @@ var TroopList = map[string]TroopInfo{
 		Name:        "cannibal",
 		ShortName:   "c",
 		Description: "Heals and buffs himself when he kills something",
-		Quote:       `"I must confess to you, I'm giving very serious thought... to eating your wife. -Hannibal Lecter"`,
+		Quote:       `"I must confess to you, I'm giving very serious thought... to eating your wife." -Hannibal Lecter`,
 		Atk:         2,
 		Secondary:   0,
 		MaxHP:       6,
 		Mv:          2,
-		Rng:         2,
+		Rng:         1,
 		Act:         TroopActions["cannibal"],
 	},
 
@@ -87,17 +87,14 @@ var TroopList = map[string]TroopInfo{
 		Name:        "assassin",
 		ShortName:   "a",
 		Description: "Can backstab to do quadruple damage",
-		Quote:       `"All warfare is based on deception. -Sun Tsu"`,
+		Quote:       `"All warfare is based on deception." -Sun Tsu`,
 		Atk:         2,
 		Secondary:   8,
 		MaxHP:       8,
 		Mv:          3,
-		Rng:         2,
+		Rng:         1,
 		Act:         TroopActions["assassin"],
 	},
-	// "assassin":
-	// "ghandi":
-
 }
 
 // returns -1 for invalid move

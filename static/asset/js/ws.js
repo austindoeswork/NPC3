@@ -17,8 +17,7 @@ function getgames() {
 function processgames(e) {
 	if (xhr.readyState == 4 && xhr.status == 200) {
 		var response = JSON.parse(xhr.responseText);
-
-		let glist  = document.getElementById("gamelist")
+		let glist = document.getElementById("gamelist");
 		glist.innerHTML = "";
 
 		for (var i = 0; i < response.length; i++) {

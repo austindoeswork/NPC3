@@ -13,11 +13,27 @@ const (
 )
 
 type Game struct {
-	Board  *Board
-	Turn   int
-	Status int
-	Winner int
-	Update chan int
+	Board   *Board
+	Turn    int
+	Status  int
+	Winner  int
+	Update  chan int
+	Timeout chan struct{}
+}
+
+func (g *Game) Killswitch() {
+	t := time.NewTimer(time.Minute * 5)
+	for {
+		select {
+		case <-g.Timeout:
+			fmt.Println("confirmed")
+			t.Reset(time.Minute * 5)
+		case <-t.C:
+			fmt.Println("killswitch activated")
+			g.End()
+			return
+		}
+	}
 }
 
 func (g *Game) AddTroop(t *Troop) error {
@@ -80,6 +96,8 @@ func (g *Game) MoveTroop(player, troopindex, x, y int) (string, error) {
 		}
 	}
 
+	// fmt.Println("killswitch deactivated")
+	// g.Timeout <- struct{}{}
 	return res, err
 }
 
@@ -98,7 +116,6 @@ func (g *Game) End() error {
 
 	g.Status = OVER
 	go func() {
-		time.Sleep(time.Second)
 		SendIntOrTimeout(g.Update, int(g.Status), 1)
 		time.Sleep(time.Second)
 		close(g.Update)
@@ -217,6 +234,7 @@ func New() *Game {
 	g.AddTroop(p1cannibal)
 	g.AddTroop(p1assassin)
 
+	// go g.Killswitch()
 	return g
 }
 

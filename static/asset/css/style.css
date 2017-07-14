@@ -46,7 +46,7 @@ body {
 }
 
 #board {
-  width: 364px;
+  width: 214px;
   height: 214px;
   display: flex;
   border: 2px solid black;

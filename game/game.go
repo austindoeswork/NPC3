@@ -164,7 +164,7 @@ func (g *Game) Step() {
 func New() *Game {
 	g := &Game{
 		Board: &Board{
-			Width: 12,
+			Width: 7,
 			// Width:    20,
 			Height: 7,
 			// Height:   15,
@@ -195,7 +195,7 @@ func New() *Game {
 	}
 
 	// TODO rando gen boulders
-	for i := 2; i < 6; i++ {
+	for i := 2; i < 5; i++ {
 		for j := 0; j < 7; j++ {
 			if rand.Intn(100) < 20 {
 				b0 := NewBoulder(i, j)
@@ -213,12 +213,12 @@ func New() *Game {
 	p0ranger, _ := NewTroop("ranger", 0, 2, 0)
 	p0cannibal, _ := NewTroop("cannibal", 1, 2, 0)
 
-	p1assassin, _ := NewTroop("assassin", 10, 2, 1)
-	p1healer, _ := NewTroop("healer", 11, 2, 1)
-	p1knight, _ := NewTroop("knight", 10, 3, 1)
-	p1king, _ := NewTroop("king", 11, 3, 1)
-	p1ranger, _ := NewTroop("ranger", 11, 4, 1)
-	p1cannibal, _ := NewTroop("cannibal", 10, 4, 1)
+	p1assassin, _ := NewTroop("assassin", g.Board.Width-2, 2, 1)
+	p1healer, _ := NewTroop("healer", g.Board.Width-1, 2, 1)
+	p1knight, _ := NewTroop("knight", g.Board.Width-2, 3, 1)
+	p1king, _ := NewTroop("king", g.Board.Width-1, 3, 1)
+	p1ranger, _ := NewTroop("ranger", g.Board.Width-1, 4, 1)
+	p1cannibal, _ := NewTroop("cannibal", g.Board.Width-2, 4, 1)
 
 	g.AddTroop(p0king)
 	g.AddTroop(p0knight)

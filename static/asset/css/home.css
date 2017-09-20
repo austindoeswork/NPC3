@@ -1,0 +1,40 @@
+* {
+  color: white;
+}
+
+body {
+  background-color: #ee9933;
+}
+
+h1 {
+  width: 100%;
+  text-align: center;
+  color: white;
+  margin: 5vmin 0;
+}
+
+h2 {
+  width: 100%;
+  text-align: center;
+}
+
+nav {
+  width: 95vw;
+  margin: 0 auto;
+}
+
+nav > ul {
+  list-style: none;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+nav > ul > li {
+  cursor: pointer;
+}
+
+nav >ul > li:hover {
+  color: #3388ee;
+}

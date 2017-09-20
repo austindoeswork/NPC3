@@ -1,0 +1,54 @@
+
+
+#boardWrap, #boardWrap * {
+  perspective-origin: top;
+  perspective: 500px;
+}
+
+#boardWrap {
+  width:100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding-bottom: 10vw;
+}
+
+#board {
+  transform: rotateX(30deg);
+  width: 50vw;
+  background: url("../graphics/sand.png");
+}
+
+.column {
+  height: calc(35vw / 8);
+  width: 100%;
+
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.sq {
+  border: 2px solid #303030;
+  background-color: rgba(255, 128, 96, 0.2);
+
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+.sq:hover {
+  background-color: rgba(255, 240, 128, 0.2);
+}
+
+
+#tooltip {
+  position: absolute;
+  border: 2px solid #c9c9c9;
+  display: none;
+  z-index: 1000;
+  opacity: 1;
+  background: #fff;
+
+  pointer-events: none;
+  padding: 2px;
+}

@@ -1,150 +1,150 @@
-var ws;
 var xhr = new XMLHttpRequest();
+var ws;
 
-function getgames() {
-	xhr.open( "GET", "//austindoes.work/games", true ); 
+function GetGames () {
+  xhr.open( 'GET', '//austindoes.work/games', true);
+  xhr.send();
+  xhr.onreadystatechange = ProcessGames;
+
+  window.setInterval(() => {
+    xhr.open('GET', '//austindoes.work/games', true);
     xhr.send();
-	xhr.onreadystatechange = processgames;
-
-	window.setInterval(function(){
-  	/// call your function here
-	xhr.open( "GET", "//austindoes.work/games", true ); 
-    xhr.send();
-	xhr.onreadystatechange = processgames;
-	}, 5000);
+    xhr.onreadystatechange = ProcessGames;
+  }, 5000);
 }
 
-function processgames(e) {
-	if (xhr.readyState == 4 && xhr.status == 200) {
-		var response = JSON.parse(xhr.responseText);
-		let glist = document.getElementById("gamelist");
-		glist.innerHTML = "";
+function ProcessGames (e) {
+  if (xhr.readyState != 4 || xhr.status != 200) {
+    return;
+  }
 
-		for (var i = 0; i < response.length; i++) {
-			let gamerow = document.createElement("div");
-			let rowjoin = rowclicked;
-			gamerow.onclick = rowjoin.bind(gamerow, response[i].Name, response[i].Players);
-			gamerow.className = " gamerow ";
+  const response = JSON.parse(xhr.responseText);
 
-			// let joinrow = document.createElement("button");
-			// let rowjoin = joinclicked;
-			// joinrow.onclick = rowjoin.bind(joinrow, response[i].Name);
+  let games = document.getElementById('gameList');
+  games.innerHTML = '';
 
-			glist.appendChild(gamerow);
-			gamerow.innerHTML = response[i].Name + " -- " + response[i].Players.toString();
-			// gamerow.appendChild(joinrow);
-			// gamerow.appendChild(watchrow);
-		}
-	}
+  _.forEach (response, (game) => {
+    let gameEl = document.createElement('div');
+    gameEl.onclick = _onRowClick.bind(gamerow, game.Name, game.Players);
+    gameEl.className += ' gameRow';
+
+    gameEl.innerHTML = game.Name + ' -- ' + game.Players.toString();
+    games.appendChild(gameEl);
+  });
 }
 
-function addlisteners() {   
-	document.getElementById("join").onclick = wsjoin;
-	document.getElementById("close").onclick = function(evt) {
-        if (!ws) {
-			return false;
-        }
-	    setstatus("DISCONNECTED", "label label-danger");
-	    ws.close();
-        return false;
-	};
+
+function _onRowClick (gameName, numPlayers) {
+  if (ws) {
+    ws.close();
+  }
+
+  const wspath = 'ws://' + location.hostname + ':' + location.port;
+  let wsroute = '/ws';
+  if (numplayers >= 2) {
+    wsroute += 'watch';
+  }
+
+  wsopen(wspath, wsroute, gameName, _onWsMessage);
 }
 
-function rowclicked(gamename, numplayers) {
-    if (ws) {
-		ws.close();
-	}
-		console.log("ROWCLICKED", gamename, numplayers);
-
-    var wspath = "ws://" + location.hostname + ":" + location.port;
-    var wsroute = "/ws";
-    if (numplayers >= 2) {
-		wsroute = "/wswatch";
-    }
-
-    wsopen(wspath, wsroute, gamename, handlemessage);
-}
-
-function wsjoin() {
-    if (ws) {
-		ws.close();
-	}
-    var wspath = "ws://" + location.hostname + ":" + location.port;
-    var wsroute = "/ws";
-    var gname = document.getElementById("gamename").value;
-    wsopen(wspath, wsroute, gname, handlemessage);
-}
-
-function handlemessage(msg) {
-	let cmd = JSON.parse(msg);
-		console.log(cmd);
-	
-	if (cmd.Type == "STATE") {
-		let currentmsg = document.getElementById("status").innerHTML;
-		if (currentmsg  != "YOUR TURN") {
-			setstatus(cmd.Message, "");
-		}
-	} else {
-		messagenoise(cmd.Message);
-		setstatus(cmd.Message, "");
-	}
-	if (cmd.Type == "STATE") {
-		update(cmd);
-	}	
-}
-
-function messagenoise(msg) {
-	if (msg == "YOUR TURN") {
-		let audio = new Audio('asset/sound/block.mp3');
-		audio.play();
-	}
-	else if (msg.includes("healed")) {
-		let audio = new Audio('asset/sound/heal.mp3');
-		audio.play();
-	}
-	else {
-		let audio = new Audio('asset/sound/chess.mp3');
-		audio.play();
-	}
-}
-
-function wsopen(wspath, wsroute, gname, handlemessage) {
-    if (ws) {
-		return false;
-    }
-    if (gname != "") {
-		ws = new WebSocket(wspath + wsroute + "?game=" + gname);
-    } else {
-		ws = new WebSocket(wspath + wsroute);
-    }
-
-    ws.onopen = function(evt) {
-	    setstatus("CONNECTED", "label label-info");
-    }
-    ws.onclose = function(evt) {
-		setstatus("DISCONNECTED", "label label-danger");
-		console.log(evt);
-		ws = null;
-    }
-    ws.onmessage = function(evt) {
-		handlemessage(evt.data);
-    }
-    ws.onerror = function(evt) {
-		setstatus("ERROR", "label label-danger");
-    }
-    return true;
-}
-
-function send(input) {
+function AddListeners () {
+  document.getElementById('join').onclick = JoinGame;
+  document.getElementById('close').onclick = function(evt) {
     if (!ws) {
-			return false;
+      return false;
     }
-    ws.send(JSON.stringify(input));
-    return true;
+
+    UpdateStatus('DISCONNECTED', 'label label-danger');
+    ws.close();
+    return false;
+  };
 }
 
-function setstatus(statusstring, className) {
-    s = document.getElementById("status");
-    s.className = className;
-    s.innerHTML = statusstring;
+
+function JoinGame () {
+  if (ws) {
+    ws.close();
+  }
+
+  const wsPath = 'ws://' + location.hostname + ':' + location.port;
+  const wsRoute = '/ws';
+  const gameName = document.getElementById('gamename').value;
+  wsopen(wsPath, wsRoute, _onWsMessage, gameName);
+}
+
+function _onWsMessage (cmd) {
+  cmd = JSON.parse(cmd);
+
+  const yourTurn = document.getElementById('status').innerHTML == 'YOUR TURN';
+  const message = cmd.Message;
+
+  if (cmd.Type == 'STATE') {
+    if (!yourTurn) {
+      UpdateStatus(message, '');
+    }
+    Game.Update(cmd);
+  } else {
+    // Sound effects
+    if (message == 'YOUR TURN') {
+      let audio = new Audio('asset/sound/block.mp3');
+      audio.play();
+    } else if (message.includes('healed')) {
+      let audio = new Audio('asset/sound/heal.mp3');
+      audio.play();
+    } else {
+      let audio = new Audio('asset/sound/chess.mp3');
+      audio.play();
+    }
+
+    // Update the status
+    UpdateStatus(message, '');
+  }
+}
+
+function wsopen (path, route, msgHandler, gameName) {
+  if (ws) {
+    return false;
+  }
+
+  if (gameName == null) {
+    ws = new WebSocket(path + route);
+  } else {
+    ws = new WebSocket(path + route + '?game=' + gname);
+  }
+
+  ws.onopen = (evt) => {
+    UpdateStatus('CONNECTED', 'label label-info');
+  }
+
+  ws.onclose = (evt) => {
+    UpdateStatus('DISCONNECTED', 'label label-danger');
+    console.log(evt);
+    ws = null;
+  }
+
+  ws.onmessage = (evt) => {
+    _onWsMessage(evt.data);
+  }
+
+  ws.onerror = function(evt) {
+    UpdateStatus('ERROR', 'label label-danger');
+  }
+
+  return true;
+}
+
+function wssend (input) {
+  if (!ws) {
+    return false;
+  }
+
+  ws.send(JSON.stringify(input));
+  return true;
+}
+
+function UpdateStatus (text, className) {
+  let statusEl = document.getElementById('status');
+  statusEl.innerHTML = text;
+  statusEl.className = className;
 }

@@ -1,0 +1,85 @@
+* {
+  font-family: 'Press Start 2P', cursive;
+  image-rendering: pixelated;
+}
+
+:root {
+  --npc-red: rgb(216, 84, 52);
+  --npc-blue: rgb(76, 144, 255);
+  --npc-green: rgb(85, 214, 25);
+  --npc-yellow: rgb(242, 238, 4);
+  --npc-orange: rgb(237, 167, 16);
+  --npc-purple: rgb(100, 62, 224);
+  --npc-cyan: rgb(9, 244, 233);
+  --npc-pink: rgb(226, 40, 211);
+  --npc-chartreuse: rgb(187, 219, 48);
+  --npc-brown: rgb(117, 82, 34);
+
+  --npc-bright-red: rgb(252, 80, 16);
+
+  --npc-white: #fff;
+  --npc-off-white: #eee;
+
+  --npc-black: #000;
+  --npc-off-black: #111;
+
+  --npc-light-gray: rgb(183, 183, 183);
+  --npc-gray: rgb(124, 124, 124);
+  --npc-dark-gray: rgb(63, 63, 63);
+
+  /* Font */
+  --npc-font-tiny: 0.7vmin;
+  --npc-font-small: 1vmin;
+  --npc-font-med-small: 1.4vmin;
+  --npc-font-med: 1.8vmin;
+  --npc-font-med-large: 2.2vmin;
+  --npc-font-large: 3vmin;
+  --npc-font-huge: 5vmin;
+  --npc-font-ginormous: 7vmin;
+}
+
+a:not(.default) {
+  text-decoration: none;
+  color: var(--npc-blue);
+}
+
+
+.noselect {
+  cursor: default;
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                   supported by Chrome and Opera */
+}
+
+.table .row:nth-child(even) {
+  background-color: #f1f1f1;
+}
+
+.table .row {
+  width: 100%;
+  padding: 2px;
+}
+
+.table .row:hover:not(.keys) {
+  border: 2px solid var(--tfx-light-blue);
+  background-color: var(--tfx-white);
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.col {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: space-between;
+}

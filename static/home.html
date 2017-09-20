@@ -1,0 +1,83 @@
+<!doctype HTML>
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+
+  <!-- Our styles -->
+  <link rel="stylesheet" href="./asset/css/normalize.css">
+  <link rel="stylesheet" href="./asset/css/main.css">
+  <link rel="stylesheet" href="./asset/css/home.css">
+  <link rel="stylesheet" href="./asset/css/board.css">
+
+  <!-- 3rd party dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+
+  <!-- Our scripts -->
+  <script src="./asset/js/util.js"></script>
+  <!-- <script src="./asset/js/entity.js"></script> -->
+  <script src="./asset/js/events.js"></script>
+  <script src="./asset/js/board.js"></script>
+  <script src="./asset/js/game.js"></script>
+  <script src="./asset/js/ws.js"></script>
+
+  <script>
+    function NavigateTo(location) {
+      console.log(location);
+    }
+  </script>
+</head>
+
+<body>
+  <h1>KRANCH</h1>
+  <nav><ul>
+    <li onclick="NavigateTo('documentation')">Documentation</li>
+    <li onclick="NavigateTo('leaderboards')">Leaderboards</li>
+    <li onclick="NavigateTo('login')">Login</li>
+  </ul></nav>
+
+  <div id="tooltip">
+    <p>Test</p>
+  </div>
+
+  <hr>
+
+  <div id="gameInfo" class="row">
+    <div id="status" class="gray">Not connected</div>
+  </div>
+
+  <div id="boardWrap"><div id="board"></div></div>
+
+  <button id="etb" disabled>No game yet</button>
+
+  <hr>
+
+  <div id="wsController" class="col">
+    <div id="newGameForm" class="row">
+      <input
+        id="gameName"
+        type="text"
+        placeholder="Room name"
+        onblur="this.placeholder = 'Room name';"
+        onfocus="this.placeholder = '';"
+      >
+      <button id="create">New room</button>
+    </div>
+
+    <p class="title">Active games:</p>
+
+    <div id="gameList">
+      <h2 id="noGames">No games being played</h2>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      Game = new Kranch();
+      AddListeners();
+      GetGames();
+    };
+  </script>
+</body>
+
+</html>

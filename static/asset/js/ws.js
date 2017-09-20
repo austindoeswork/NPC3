@@ -1,13 +1,18 @@
 var xhr = new XMLHttpRequest();
 var ws;
 
+const URL = '//' + location.hostname
+
+
+// XHR, deal with game list
+
 function GetGames () {
-  xhr.open( 'GET', '//austindoes.work/games', true);
+  xhr.open( 'GET', URL + '/games', true);
   xhr.send();
   xhr.onreadystatechange = ProcessGames;
 
   window.setInterval(() => {
-    xhr.open('GET', '//austindoes.work/games', true);
+    xhr.open('GET', URL + '/games', true);
     xhr.send();
     xhr.onreadystatechange = ProcessGames;
   }, 5000);
@@ -23,9 +28,10 @@ function ProcessGames (e) {
   let games = document.getElementById('gameList');
   games.innerHTML = '';
 
-  _.forEach (response, (game) => {
+  _.forEach(response, (game) => {
     let gameEl = document.createElement('div');
-    gameEl.onclick = _onRowClick.bind(gamerow, game.Name, game.Players);
+    gameEl.id = game.Name;
+    gameEl.onclick = _onRowClick.bind(gameEl, game.Name, game.Players);
     gameEl.className += ' gameRow';
 
     gameEl.innerHTML = game.Name + ' -- ' + game.Players.toString();
@@ -34,50 +40,13 @@ function ProcessGames (e) {
 }
 
 
-function _onRowClick (gameName, numPlayers) {
-  if (ws) {
-    ws.close();
-  }
-
-  const wspath = 'ws://' + location.hostname + ':' + location.port;
-  let wsroute = '/ws';
-  if (numplayers >= 2) {
-    wsroute += 'watch';
-  }
-
-  wsopen(wspath, wsroute, gameName, _onWsMessage);
-}
-
-function AddListeners () {
-  document.getElementById('join').onclick = JoinGame;
-  document.getElementById('close').onclick = function(evt) {
-    if (!ws) {
-      return false;
-    }
-
-    UpdateStatus('DISCONNECTED', 'label label-danger');
-    ws.close();
-    return false;
-  };
-}
-
-
-function JoinGame () {
-  if (ws) {
-    ws.close();
-  }
-
-  const wsPath = 'ws://' + location.hostname + ':' + location.port;
-  const wsRoute = '/ws';
-  const gameName = document.getElementById('gamename').value;
-  wsopen(wsPath, wsRoute, _onWsMessage, gameName);
-}
+// Websocket handlers
 
 function _onWsMessage (cmd) {
   cmd = JSON.parse(cmd);
 
-  const yourTurn = document.getElementById('status').innerHTML == 'YOUR TURN';
-  const message = cmd.Message;
+  const yourTurn = document.getElementById('status').innerHTML == 'Your turn';
+  let message = cmd.Message;
 
   if (cmd.Type == 'STATE') {
     if (!yourTurn) {
@@ -87,17 +56,19 @@ function _onWsMessage (cmd) {
   } else {
     // Sound effects
     if (message == 'YOUR TURN') {
-      let audio = new Audio('asset/sound/block.mp3');
+      let audio = new Audio('asset/audio/block.mp3');
       audio.play();
     } else if (message.includes('healed')) {
-      let audio = new Audio('asset/sound/heal.mp3');
+      let audio = new Audio('asset/audio/heal.mp3');
       audio.play();
     } else {
-      let audio = new Audio('asset/sound/chess.mp3');
+      let audio = new Audio('asset/audio/chess.mp3');
       audio.play();
     }
 
     // Update the status
+    message = message.toLowerCase();
+    message = message.charAt(0).toUpperCase + message.slice(1);
     UpdateStatus(message, '');
   }
 }
@@ -110,15 +81,15 @@ function wsopen (path, route, msgHandler, gameName) {
   if (gameName == null) {
     ws = new WebSocket(path + route);
   } else {
-    ws = new WebSocket(path + route + '?game=' + gname);
+    ws = new WebSocket(path + route + '?game=' + gameName);
   }
 
   ws.onopen = (evt) => {
-    UpdateStatus('CONNECTED', 'label label-info');
+    UpdateStatus('Connected', 'green');
   }
 
   ws.onclose = (evt) => {
-    UpdateStatus('DISCONNECTED', 'label label-danger');
+    UpdateStatus('Disconnected', 'gray');
     console.log(evt);
     ws = null;
   }
@@ -128,7 +99,7 @@ function wsopen (path, route, msgHandler, gameName) {
   }
 
   ws.onerror = function(evt) {
-    UpdateStatus('ERROR', 'label label-danger');
+    UpdateStatus('Error :(', 'red');
   }
 
   return true;
@@ -143,8 +114,30 @@ function wssend (input) {
   return true;
 }
 
-function UpdateStatus (text, className) {
-  let statusEl = document.getElementById('status');
-  statusEl.innerHTML = text;
-  statusEl.className = className;
+// Helper for creating a game
+function CreateGame () {
+  if (ws) {
+    ws.close();
+  }
+
+  const wsPath = 'ws://' + location.hostname + ':' + location.port;
+  const wsRoute = '/ws';
+  const gameName = document.getElementById('gameName').value;
+
+  wsopen(wsPath, wsRoute, _onWsMessage, gameName);
+}
+
+function _onRowClick (gameName, numPlayers) {
+  if (ws) {
+    ws.close();
+  }
+
+  const wspath = 'ws://' + location.hostname + ':' + location.port;
+  let wsroute = '/ws';
+  if (numPlayers >= 2) {
+    wsroute += 'watch';
+  }
+
+  wsopen(wspath, wsroute, _onWsMessage, gameName);
+  // document.getElementById(gameName).classList.toggle('selected', true);
 }

@@ -22,11 +22,14 @@ class Board {
       document.body.appendChild(this.board);
     }
 
+    this.height = BOARD_HEIGHT;
+    this.width = BOARD_WIDTH;
+
     // Create the dom elements for all squares
-    for (let j = 0; j < BOARD_HEIGHT; j++) {
+    for (let j = 0; j < this.height; j++) {
       let col = document.createElement('div');
       col.className = 'column';
-      for (let i = 0; i < BOARD_WIDTH; i++) {
+      for (let i = 0; i < this.width; i++) {
         let sq = document.createElement('div');
         sq.className = 'sq';
         sq.id = XyToRf(i, j)

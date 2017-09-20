@@ -3,7 +3,8 @@
 }
 
 body {
-  background-color: #ee9933;
+  /*background-color: #ee9933;*/
+  background-color: var(--npc-orange);
 }
 
 h1 {
@@ -19,7 +20,7 @@ h2 {
 }
 
 nav {
-  width: 95vw;
+  width: 89vw;
   margin: 0 auto;
 }
 
@@ -35,6 +36,76 @@ nav > ul > li {
   cursor: pointer;
 }
 
-nav >ul > li:hover {
+nav > ul > li:hover {
   color: #3388ee;
+}
+
+#gameInfo {
+  width: 90%;
+  justify-content: flex-end;
+
+}
+
+#status.red {
+  color: var(--npc--red);
+}
+
+#status.gray {
+  color: var(--npc-gray);
+}
+
+#status.green {
+  color: var(--npc--green);
+}
+
+#newGameForm > * {
+  margin: 0 2.5%;
+}
+
+button, input {
+  background: var(--npc-white);
+  color: var(--npc-dark-gray);
+  padding: 1.5%;
+}
+
+button:active {
+  background: var(--npc-light-gray);
+}
+
+button:disabled {
+  background: var(--npc-gray);
+}
+
+#join {
+  width: 135px;
+}
+
+hr {
+  margin: 2% auto;
+  width: 89vw;
+  border-top: 4px dashed var(--npc-white);
+}
+
+.title {
+  width: 89vw;
+  text-align: left;
+  margin: 1% 0;
+}
+
+#gameList {
+  border: 4px dashed var(--npc-white);
+  width: 89vw;
+}
+
+#noGames {
+  padding: 1%;
+}
+
+.gameRow {
+  padding: 1%;
+  cursor: pointer;
+}
+
+.gameRow:hover, .gameRow.selected {
+  background-color: var(--npc-blue);
 }

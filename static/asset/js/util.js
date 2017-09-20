@@ -11,3 +11,34 @@ function XyToRf (x, y) {
   // Id of the square
   const id = letters[x-1] + (BOARD_HEIGHT-y);
 }
+
+/*
+  Decide what color to use for a troop (based on team)
+*/
+function TroopColor (t) {
+  if (t.Owner == 0) {
+    if (!t.CanAct) {
+      return '#9898b3'
+    } else {
+      return 'lightblue'
+    }
+  }
+
+  if (t.Owner == 1) {
+    if (!t.CanAct) {
+      return '#936c6c' //greyish red
+    } else {
+      return 'pink'
+    }
+  }
+}
+
+
+/*
+  Change the text and color of the status message
+*/
+function UpdateStatus (text, className) {
+  let statusEl = document.getElementById('status');
+  statusEl.innerHTML = text;
+  statusEl.className = className;
+}

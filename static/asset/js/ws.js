@@ -48,6 +48,8 @@ function _onWsMessage (cmd) {
   const yourTurn = document.getElementById('status').innerHTML == 'Your turn';
   let message = cmd.Message;
 
+  console.log(cmd);
+
   if (cmd.Type == 'STATE') {
     if (!yourTurn) {
       UpdateStatus(message, '');
@@ -68,7 +70,7 @@ function _onWsMessage (cmd) {
 
     // Update the status
     message = message.toLowerCase();
-    message = message.charAt(0).toUpperCase + message.slice(1);
+    message = message.charAt(0).toUpperCase() + message.slice(1);
     UpdateStatus(message, '');
   }
 }

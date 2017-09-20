@@ -5,11 +5,11 @@ function MakeMove(troop, toX, toY) {
   var msg = {
     'Type': 'MOVE',
     'Troop': troop,
-    'X': tox,
-    'Y': toy
+    'X': toX,
+    'Y': toY
   };
 
-  send(msg);
+  wssend(msg);
 }
 
 // Helper for ending a turn
@@ -18,7 +18,7 @@ function EndTurn () {
     'Type': 'END',
   };
 
-  send(msg);
+  wssend(msg);
 }
 
 class Kranch {
@@ -28,7 +28,6 @@ class Kranch {
     this.clickedX = -1;
     this.clickedY = -1;
 
-    this.tileList = [];
     this.ClearMap();
 
     this.player = '';
@@ -38,7 +37,7 @@ class Kranch {
 
   InitBoard (insertId, boardId) {
     let boardObject = new Board(insertId, boardId);
-    let boardElement = boardObject.board;
+    let boardElement = boardObject.boardHolder;
 
     boardElement.addEventListener('mouseover', ShowTooltip);
     boardElement.addEventListener('mouseout', HideTooltip);
@@ -60,33 +59,15 @@ class Kranch {
     return this.board.height;
   }
 
-  // Hover a tile or make a move
-  ClickTile () {
-    if (this.clickedX == -1 || this.clickedY == -1) {
-      // If no tile is already selected, select the clicked tile
-      let index = y * this.width + x;
-      this.clickedX = x;
-      this.clickedY = y;
-      this.tileList[index].style.border = '1px solid #00ff99';
-    } else {
-      // Else this click is a move input
-      let index = this.clickedY * this.width + this.clickedX;
-      if (typeof this.map[index].Troop != 'undefined') {
-        if (this.map[index].Troop.Owner == this.player) {
-          MakeMove(this.map[index].Index, x, y);
-        }
-      }
-
-      // Unhighlight the other tile
-      this.ClearClicked();
-    }
+  get tileList () {
+    return this.board.tiles;
   }
 
   // Clear the selected tile
   ClearClicked () {
     if (this.clickedX != -1 && this.clickedY != -1) {
       let index = this.clickedY * this.width + this.clickedX;
-      this.tileList[index].style.border = '1px solid grey';
+      this.tileList[index].classList.toggle('selected', false);
 
       this.clickedX = -1;
       this.clickedY = -1;
@@ -117,8 +98,10 @@ class Kranch {
 
     this.player = state.You;
 
+    console.log(state.You);
+    console.log(state.Turn % 2);
     if (state.You == state.Turn % 2) {
-      delete document.getElementById('etb').disabled;
+      document.getElementById('etb').disabled = false;
       document.getElementById('etb').innerHTML = 'End Turn';
     } else {
       document.getElementById('etb').disabled = true;
@@ -155,7 +138,6 @@ class Kranch {
         }
 
         this.tileList[index].innerHTML += ' <p class="tileinfo">'+ t.Info.Atk+ ' ' + t.HP + '</p>';
-        this.tileList[index].style.backgroundColor = troopcolor(t);
         this.map[index].Troop = t;
         this.map[index].Index = j;
       }

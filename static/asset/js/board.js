@@ -14,17 +14,20 @@ class Board {
       document.body.appendChild(this.insert);
     }
 
-    this.board = document.getElementById(board);
+    this.boardHolder = document.getElementById(board);
     // Create board if it doesn't exist yet
-    if (this.board == null) {
-      this.board = document.createElement('div');
-      this.board.id = board;
+    if (this.boardHolder == null) {
+      this.boardHolder = document.createElement('div');
+      this.boardHolder.id = board;
       document.body.appendChild(this.board);
     }
 
     this.height = BOARD_HEIGHT;
     this.width = BOARD_WIDTH;
 
+    this.tiles = [];
+
+    // TODO: i and j might be mixed up here
     // Create the dom elements for all squares
     for (let j = 0; j < this.height; j++) {
       let col = document.createElement('div');
@@ -33,12 +36,17 @@ class Board {
         let sq = document.createElement('div');
         sq.className = 'sq';
         sq.id = XyToRf(i, j)
-        col.appendChild(sq);
-      }
-      this.board.appendChild(col);
-    }
 
-    // List of entities (troops + rocks)
-    this.entities = [];
+        col.appendChild(sq);
+
+        sq.onmouseenter = TileHover.bind(sq, j*this.width + i);
+        sq.onmouseleave = TileExit.bind(sq);
+        sq.onclick = ClickTile.bind(sq, i, j);
+
+        this.tiles.push(sq)
+      }
+
+      this.boardHolder.appendChild(col);
+    }
   }
 }

@@ -9,7 +9,8 @@ function XyToRf (x, y) {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
 
   // Id of the square
-  const id = letters[x-1] + (BOARD_HEIGHT-y);
+  const id = letters[x] + (BOARD_HEIGHT-y);
+  return id;
 }
 
 /*
@@ -20,7 +21,7 @@ function TroopColor (t) {
     if (!t.CanAct) {
       return '#9898b3'
     } else {
-      return 'lightblue'
+      return 'var(--npc-white)';
     }
   }
 

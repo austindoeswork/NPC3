@@ -19,17 +19,17 @@ function XyToRf (x, y) {
 function TroopColor (t) {
   if (t.Owner == 0) {
     if (!t.CanAct) {
-      return '#9898b3'
+      return 'var(--my-team-inactive)';
     } else {
-      return 'var(--npc-white)';
+      return 'var(--my-team-color)';
     }
   }
 
   if (t.Owner == 1) {
     if (!t.CanAct) {
-      return '#936c6c' //greyish red
+      return 'var(--their-team-inactive)';
     } else {
-      return 'pink'
+      return 'var(--their-team-color)';
     }
   }
 }

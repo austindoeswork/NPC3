@@ -48,8 +48,6 @@ function _onWsMessage (cmd) {
   const yourTurn = document.getElementById('status').innerHTML == 'Your turn';
   let message = cmd.Message;
 
-  console.log(cmd);
-
   if (cmd.Type == 'STATE') {
     if (!yourTurn) {
       UpdateStatus(message, '');

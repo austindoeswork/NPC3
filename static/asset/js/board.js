@@ -50,3 +50,55 @@ class Board {
     }
   }
 }
+
+function PlaceSprite (troop, player, id) {
+  // Check which side
+  const row = id[0];
+  const col = Number(id[1]);
+
+  const el = document.getElementById(id);
+  const r = el.getBoundingClientRect();
+  console.log(el);
+  console.log(r);
+
+  let img = document.createElement('img');
+  // img.src = './graphics/cannibal/portrait.png';
+  img.src = './asset/graphics/';
+
+  img.className = 'troopa';
+
+  if (Number(player) == 1) {
+    img.src += 'p2/';
+  } else {
+    // Player 1, mirror the pieces
+    img.style.transform = 'scaleX(-1)';
+    img.src += 'p1/';
+  }
+
+  img.src += troop + '.png';
+
+  let bottom = window.scrollY + r.bottom;
+
+  let left = (r.left + r.right)/2;
+  left -= (r.right - r.left)/2;
+
+  img.style.bottom = bottom + 'px';
+  img.style.left = left + 'px';
+
+  img.style.width = r.width + 'px';
+  img.style.height = 'auto';
+
+  img.style.zIndex = (1000 - col) + '' ;
+
+  document.body.insertBefore(img, document.getElementById('boardWrap'));
+
+  return img;
+}
+
+function ClearSprites () {
+  // Delete all sprites from the dom
+  let els = document.getElementsByClassName('troopa');
+  while (els.length > 0) {
+    els[0].parentNode.removeChild(els[0]);
+  }
+}

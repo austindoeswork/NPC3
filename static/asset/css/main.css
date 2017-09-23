@@ -27,8 +27,10 @@
   --npc-gray: rgb(164, 164, 164);
   --npc-dark-gray: rgb(64, 64, 64);
 
-  --my-team-color: rgb(32, 128, 240);
+  --my-team-color: rgb(117, 154, 196);
+  --my-team-inactive: rgb(32, 128, 240);
   --their-team-color: rgb(240, 128, 128);
+  --their-team-inactive: rgb(198, 151, 151);
 
   /* Font */
   --npc-font-tiny: 0.7vmin;

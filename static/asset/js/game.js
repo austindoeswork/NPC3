@@ -39,9 +39,6 @@ class Kranch {
     let boardObject = new Board(insertId, boardId);
     let boardElement = boardObject.boardHolder;
 
-    boardElement.addEventListener('mouseover', ShowTooltip);
-    boardElement.addEventListener('mouseout', HideTooltip);
-
     window.addEventListener('mousemove', (e) => {
       let tt = document.getElementById('tooltip');
       tt.style.bottom = window.innerHeight - e.clientY.toString() + 'px';
@@ -91,15 +88,11 @@ class Kranch {
   // Read / Parse the state
 
   Update (state) {
-    console.log('got update')
-
     this.ClearMap();
     this.ClearTiles();
 
     this.player = state.You;
 
-    console.log(state.You);
-    console.log(state.Turn % 2);
     if (state.You == state.Turn % 2) {
       document.getElementById('etb').disabled = false;
       document.getElementById('etb').innerHTML = 'End Turn';
@@ -110,6 +103,8 @@ class Kranch {
 
     this.troops = state.Troops;
     this.boulders = state.Boulders;
+
+    ClearSprites();
 
     this.ParseTroops();
     this.ParseBoulders();
@@ -131,13 +126,13 @@ class Kranch {
         let y = t.Y;
         let index = y * this.width + x;
 
+        let sprite = PlaceSprite(t.Info.Name, t.Owner, XyToRf(x, y));
+
         if (t.Step < t.Info.Mv) {
-          this.tileList[index].innerHTML = '<b class="glow">' + t.Info.ShortName + '</b>';
-        } else {
-          this.tileList[index].innerHTML = t.Info.ShortName;
+          sprite.classList.toggle('exhausted', true);
         }
 
-        this.tileList[index].innerHTML += ' <p class="tileinfo">'+ t.Info.Atk+ ' ' + t.HP + '</p>';
+        this.tileList[index].innerHTML = ' <p class="tileinfo">'+ t.Info.Atk+ ' ' + t.HP + '</p>';
         this.map[index].Troop = t;
         this.map[index].Index = j;
       }

@@ -15,11 +15,13 @@ function TileHover (i) {
     tt.style.borderColor = TroopColor(tSpot.Troop);
 
     // Populate da tooltip with da info
-    tt.innerHTML = tSpot.Troop.Nickname + ' the ' + tSpot.Troop.Info.Name;
-    tt.innerHTML += '<p class="description">' + tSpot.Troop.Info.Description + '</p>';
-    tt.innerHTML += '<p class="quote">' + tSpot.Troop.Info.Quote + '</p>';
+    document.getElementById('ttName').innerHTML = tSpot.Troop.Nickname + ' the ' + tSpot.Troop.Info.Name;
+    document.getElementById('ttDesc').innerHTML = tSpot.Troop.Info.Description;
+    document.getElementById('ttQuote').innerHTML = tSpot.Troop.Info.Quote;
 
     ShowTooltip();
+  } else {
+    HideTooltip();
   }
 }
 
@@ -30,6 +32,10 @@ function TileExit () {
 
 // Hover a tile or make a move
 function ClickTile (x, y) {
+  if (document.getElementById('status').innerHTML.slice(0, 4) != 'Your') {
+    return;
+  }
+
   if (Game.clickedX == -1 || Game.clickedY == -1) {
     // If no tile is already selected, select the clicked tile
     let index = y * Game.width + x;

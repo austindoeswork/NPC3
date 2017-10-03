@@ -32,7 +32,7 @@ function TileExit () {
 
 // Hover a tile or make a move
 function ClickTile (x, y) {
-  if (document.getElementById('status').innerHTML.slice(0, 4) != 'Your') {
+  if (document.getElementById('etb').disabled) {
     return;
   }
 

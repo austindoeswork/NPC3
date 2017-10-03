@@ -58,8 +58,6 @@ function PlaceSprite (troop, player, id) {
 
   const el = document.getElementById(id);
   const r = el.getBoundingClientRect();
-  console.log(el);
-  console.log(r);
 
   let img = document.createElement('img');
   // img.src = './graphics/cannibal/portrait.png';
@@ -69,7 +67,7 @@ function PlaceSprite (troop, player, id) {
 
   if (Number(player) == 1) {
     img.src += 'p2/';
-  } else {
+  } else if (Number(player) == 0){
     // Player 1, mirror the pieces
     img.style.transform = 'scaleX(-1)';
     img.src += 'p1/';
@@ -77,18 +75,21 @@ function PlaceSprite (troop, player, id) {
 
   img.src += troop + '.png';
 
-  let bottom = window.scrollY + r.bottom;
+  const scale = 0.7;
 
-  let left = (r.left + r.right)/2;
-  left -= (r.right - r.left)/2;
-
-  img.style.bottom = bottom + 'px';
-  img.style.left = left + 'px';
-
-  img.style.width = r.width + 'px';
+  let pieceWidth = r.width * scale;
+  img.style.width = pieceWidth + 'px';
   img.style.height = 'auto';
 
   img.style.zIndex = (1000 - col) + '' ;
+
+  let top = window.scrollY + r.top;
+  top -= r.height * 0.5;
+
+  let left = r.left + (r.width - pieceWidth)/2;
+
+  img.style.top = top + 'px';
+  img.style.left = left + 'px';
 
   document.body.insertBefore(img, document.getElementById('boardWrap'));
 

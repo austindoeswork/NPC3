@@ -37,7 +37,7 @@
 
   display: flex;
   flex-flow: column;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   width: 50px;
 }
@@ -50,8 +50,27 @@
   background-color: rgba(255, 240, 128, 0.2);
 }
 
+.tileinfo {
+  width: 90%;
+  height: 95%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 1.5vmin;
+}
+
+.tileinfo.player0 {
+  align-items: flex-end;
+}
+
+.tileinfo.player1 {
+  align-items: flex-start;
+}
+
 .troopa {
   position: absolute;
+  pointer-events: none;
 }
 
 .troopa.exhausted {

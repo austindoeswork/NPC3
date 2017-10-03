@@ -132,7 +132,7 @@ class Kranch {
           sprite.classList.toggle('exhausted', true);
         }
 
-        this.tileList[index].innerHTML = ' <p class="tileinfo">'+ t.Info.Atk+ ' ' + t.HP + '</p>';
+        this.tileList[index].innerHTML = '<div class="tileinfo player' + t.Owner + '"><span class="atk">'+ t.Info.Atk+ '</span><span class="def">' + t.HP + '</span></div>';
         this.map[index].Troop = t;
         this.map[index].Index = j;
       }
@@ -145,7 +145,9 @@ class Kranch {
       let y = this.boulders[i].Y;
       let index = y * this.width + x;
 
-      this.tileList[index].innerHTML = '* <p class="tileinfo">' + this.boulders[i].HP + '</p>';
+      PlaceSprite('rock', -1, XyToRf(x, y));
+
+      this.tileList[index].innerHTML = '<div class="tileinfo">' + this.boulders[i].HP + '</div>';
       this.map[index].Type = 2;
       this.map[index].Index = i;
     }
